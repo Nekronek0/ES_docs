@@ -17,8 +17,11 @@ Explanation of the basic terms of ES. Adapted from https://www.elastic.co/guide/
 - Index: a collection of documents that have simmilar characteristics (i.e. a Collection in MongoDB)
 - Type: Within an index you can have one or more types. If we were to move Mijn Kwik to ES, mijn-kwik.experiments would be a type.
 - Document: Same thing as in any Document DB. It is the basic unit of data, in JSON format
-- Shards and replicas: It is possible to horizontally split an index. The parts of teh index are then called shards. Shards are nice because they allow to split content volume and to distribute and paralellize operations.
-Replicas are nice because they are basically a backup of your data that can be used to search the same content in parallel.
+- Shards: It is possible to horizontally split an index. The parts of the index are then called shards. Shards are nice because they allow to split content volume and to distribute and paralellize operations.
+- Replicas: Replicas are nice because they are basically a backup of your data that can be used to search the same content in parallel.
+
+### Mappings
+Elasticsearch can also map the documents in an index or type automatically. Sometimes, however, it is preferable to create (part of) a mapping manually. For example, elasticsearch will flatten arrays of objects. The Nested Object datatype was specially created to keep the structure, but these are not mapped automatically. Ingesting data is also faster when a full mapping is created before loading the data.
 
 ### ES actions
 All the actions are in CURL format
