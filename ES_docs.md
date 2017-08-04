@@ -17,8 +17,11 @@ Explanation of the basic terms of ES. Adapted from https://www.elastic.co/guide/
 - Index: a collection of documents that have simmilar characteristics (i.e. a Collection in MongoDB)
 - Type: Within an index you can have one or more types. If we were to move Mijn Kwik to ES, mijn-kwik.experiments would be a type.
 - Document: Same thing as in any Document DB. It is the basic unit of data, in JSON format
-- Shards and replicas: It is possible to horizontally split an index. The parts of teh index are then called shards. Shards are nice because they allow to split content volume and to distribute and paralellize operations.
-Replicas are nice because they are basically a backup of your data that can be used to search the same content in parallel.
+- Shards: It is possible to horizontally split an index. The parts of the index are then called shards. Shards are nice because they allow to split content volume and to distribute and paralellize operations.
+- Replicas: Replicas are nice because they are basically a backup of your data that can be used to search the same content in parallel.
+
+### Mappings
+Elasticsearch can also map the documents in an index or type automatically. Sometimes, however, it is preferable to create (part of) a mapping manually. For example, elasticsearch will flatten arrays of objects. The Nested Object datatype was specially created to keep the structure, but these are not mapped automatically. Ingesting data is also faster when a full mapping is created before loading the data.
 
 ### ES actions
 All the actions are in CURL format
@@ -42,18 +45,18 @@ Updates the ID 1 document, changing the name field, and inserting an age.
 Updates age with a script
 
 #### Using the bulk API
-`'''curl -XPOST 'localhost:9200/customer/external/_bulk?pretty&pretty' -H 'Content-Type: application/json' -d'
+`curl -XPOST 'localhost:9200/customer/external/_bulk?pretty&pretty' -H 'Content-Type: application/json' -d'
 {"index":{"_id":"1"}}
 {"name": "John Doe" }
 {"index":{"_id":"2"}}
 {"name": "Jane Doe" }
-' '''`
+'`
 #### Loading a dataset
 `curl -H "Content-Type: application/json" -XPOST 'localhost:9200/bank/account/_bulk?pretty&refresh' --data-binary "@accounts.json"`
 Creates the bank index, with the account type and load the data from accounts.json
 
 #### Define a mapping
-"""PUT /example
+`PUT /example
 {
   "mappings": {
     "tracking": {
@@ -75,11 +78,11 @@ Creates the bank index, with the account type and load the data from accounts.js
       }
     }
   }
-}"""
+}`
 
 #### Sample queries
 ##### `match_all`
-curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
+`curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
 {
   "query": { "match_all": {} },
   "size": 20,
@@ -87,19 +90,19 @@ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/js
   "sort": [
     { "account_number": "asc" }
   ]
-}
-'
+}`
+
 Match all query with ascending sort, returning 20 results (10 is default), starting from the 12th document. 
 ##### SQL SELECT * FROM plugins.name;
 
-GET /example/_search
+`GET /example/_search
 {
   "query": { "match_all": {} },
   "_source": ["plugins.name"]
-}
+}`
 
 ##### Bool
-curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
+`curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
 {
   "query": {
     "bool": {
@@ -111,12 +114,11 @@ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/js
       ]
     }
   }
-}
-'
+}`
 In SQL: SELECT * FROM bank WHERE age = 40 AND state != "ID"
 
 ##### filter
-curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
+`curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
 {
   "query": {
     "bool": {
@@ -132,11 +134,11 @@ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/js
     }
   }
 }
-'
+`
 
 ##### Aggregations
 
-curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
+`curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/json' -d'
 {
   "size": 0,
   "aggs": {
@@ -175,9 +177,9 @@ curl -XGET 'localhost:9200/bank/_search?pretty' -H 'Content-Type: application/js
     }
   }
 }
-'
+`
 
-Size 0 lets you output only teh results from teh aggregation, if size > 0: it will also output results from the query (in this example there is no query)
+Size 0 lets you output only the results from teh aggregation, if size > 0: it will also output results from the query (in this example there is no query)
 
 #### Snapshots
 Snapshot guide at elastic.co:
